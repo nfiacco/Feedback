@@ -5,8 +5,12 @@ import { applyMiddleware, createStore } from "redux";
 import thunkMiddleware, { ThunkAction } from "redux-thunk";
 import { GoogleLoginResponse } from "react-google-login"
 
+function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
+  return (response as GoogleLoginResponse).googleId !== undefined;
+}
+
 const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-  if (response instanceof GoogleLoginResponseOffline) {
+  if (!isGoogleLoginResponse(response)) {
     return;
   }
 
