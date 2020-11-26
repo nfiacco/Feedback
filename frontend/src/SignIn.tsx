@@ -17,12 +17,12 @@ const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffli
   var id_token = response.getAuthResponse().id_token;
 
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://localhost:8080/login');
+  xhr.open('POST', 'https://feedback-nbt4bnbhra-uw.a.run.app/login');
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
     console.log('Signed in as: ' + xhr.responseText);
   };
-  xhr.send('idtoken=' + id_token);
+  xhr.send(JSON.stringify({'idtoken': id_token}));
   console.log(response);
 }
 
