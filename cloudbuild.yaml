@@ -1,0 +1,42 @@
+steps:
+  - id: install-proxy
+    name: gcr.io/cloud-builders/wget
+    entrypoint: bash
+    args:
+      - '-c'
+      - 'wget -O /workspace/cloud_sql_proxy https://storage.googleapis.com/cloudsql-proxy/v1.15/cloud_sql_proxy.linux.386 && chmod +x /workspace/cloud_sql_proxy'
+    waitFor: ['-']
+
+  - id: install-migrate
+    name: gcr.io/cloud-builders/curl
+    entrypoint: bash
+    args:
+      - '-c'
+      - 'curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz && mv migrate.linux-amd64 /workspace/migrate && chmod +x /workspace/migrate'
+    waitFor: ['-']
+
+  - id: get-service-account-key
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: 'bash'
+    args: [ '-c', "gcloud secrets versions access latest --secret=cloud-build-service-account-key --format='get(payload.data)' | tr '_-' '/+' | base64 -d > /workspace/service-account-key.json" ]
+    waitFor: ['-']
+
+  - id: get-database-password
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - "gcloud secrets versions access latest --secret=cloud-sql-feedback-password --format='get(payload.data)' | tr '_-' '/+' | base64 -d > /workspace/database-password.txt"
+    waitFor: ['-']
+
+  - id: migrate
+    name: gcr.io/cloud-builders/docker
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        /workspace/cloud_sql_proxy -instances=deep-rainfall-296803:us-west1:feedback-db=tcp:3306 -credential_file=/workspace/service-account-key.json & sleep 2 && \
+        /workspace/migrate -path backend/migrations/ -database postgres://postgres:$(cat /workspace/database-password.txt)@localhost:3306/feedback?sslmode=disable up && \
+        echo "MIGRATION COMPLETE"
+    waitFor: ['install-proxy', 'install-migrate', 'get-service-account-key', 'get-database-password']
+
