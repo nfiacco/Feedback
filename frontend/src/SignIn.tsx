@@ -5,6 +5,8 @@ import { applyMiddleware, createStore } from "redux";
 import thunkMiddleware, { ThunkAction } from "redux-thunk";
 import { GoogleLoginResponse } from "react-google-login"
 
+const ROOT_DOMAIN = process.env.NODE_ENV === "production" ? "https://feedback-nbt4bnbhra-uw.a.run.app" : "http://localhost:8080";
+
 function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
   return (response as GoogleLoginResponse).googleId !== undefined;
 }
@@ -17,7 +19,7 @@ const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffli
   var id_token = response.getAuthResponse().id_token;
 
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://feedback-nbt4bnbhra-uw.a.run.app/login');
+  xhr.open('POST', ROOT_DOMAIN + '/login');
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
     console.log('Signed in as: ' + xhr.responseText);

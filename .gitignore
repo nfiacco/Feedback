@@ -11,6 +11,8 @@ coverage
 # production
 build
 
+backend/bin
+
 # misc
 .DS_Store
 .env.local

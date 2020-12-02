@@ -32,6 +32,9 @@ func (app *App) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	payload, err := validator.Validate(ctx, loginRequest.IdToken, CLIENT_ID)
-	log.Printf("got payload %+v", payload)
+	log.Printf("got payload subject: %+v", payload.Subject)
+	log.Printf("got payload email: %+v", payload.Claims["email"])
+	log.Printf("got payload family name: %+v", payload.Claims["family_name"])
+	log.Printf("got payload given name: %+v", payload.Claims["given_name"])
 	return
 }

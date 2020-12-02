@@ -18,6 +18,26 @@ func mustGetenv(k string) string {
 }
 
 func InitDatabase() (*gorm.DB, error) {
+	if isProd() {
+		return initDatabaseProd()
+	} else {
+		return initDatabaseDev()
+	}
+}
+
+func initDatabaseDev() (*gorm.DB, error) {
+	var dbURI string
+	dbURI = fmt.Sprintf("user=postgres database=feedback host=localhost")
+
+	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("sql.Open: %v", err)
+	}
+
+	return db, nil
+}
+
+func initDatabaseProd() (*gorm.DB, error) {
 	var (
 		dbUser                 = mustGetenv("DB_USER")                  // e.g. 'my-db-user'
 		dbPwd                  = mustGetenv("DB_PASS")                  // e.g. 'my-db-password'
@@ -39,4 +59,9 @@ func InitDatabase() (*gorm.DB, error) {
 	}
 
 	return db, nil
+}
+
+func isProd() bool {
+	_, isSet := os.LookupEnv("IS_PROD")
+	return isSet
 }

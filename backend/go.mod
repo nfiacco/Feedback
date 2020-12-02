@@ -1,4 +1,4 @@
-module feedback-api
+module feedback
 
 go 1.15
 

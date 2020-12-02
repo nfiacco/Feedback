@@ -1,8 +1,8 @@
 package main
 
 import (
-	"feedback-api/internal/application"
-	"feedback-api/internal/database"
+	"feedback/internal/application"
+	"feedback/internal/database"
 	"log"
 	"net/http"
 
