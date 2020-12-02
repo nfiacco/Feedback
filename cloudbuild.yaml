@@ -42,12 +42,25 @@ steps:
 
   - id: build-backend
     name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/deep-rainfall-296803/feedback', 'backend/']
+    args: ['build', '-t', 'gcr.io/deep-rainfall-296803/feedback:$COMMIT_SHA', 'backend/']
+    waitFor: ['-']
+
+  - id: push-backend
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/deep-rainfall-296803/feedback:$COMMIT_SHA']
+    waitFor: ['build-backend']
+
+  - id: deploy-backend
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'feedback', '--image', 'gcr.io/deep-rainfall-296803/feedback:$COMMIT_SHA', '--region', 'us-west1', '--platform', 'managed']
+    waitFor: ['push-backend']
 
   - id: install-frontend
     name: node
     entrypoint: npm
     args: ['--prefix', 'frontend/', 'install']
+    waitFor: ['-']
 
   - id: build-frontend
     name: node
@@ -59,5 +72,6 @@ steps:
     name: 'gcr.io/cloud-builders/gsutil'
     entrypoint: gsutil
     args: ['cp', '-r', 'frontend/build/*', 'gs://www.anonymousfeedback.app']
+    waitFor: ['build-frontend']
 
-images: ['gcr.io/deep-rainfall-296803/feedback']
+images: ['gcr.io/deep-rainfall-296803/feedback:$COMMIT_SHA']
