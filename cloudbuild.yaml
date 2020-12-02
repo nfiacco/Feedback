@@ -47,7 +47,7 @@ steps:
   - id: build-frontend
     name: node
     entrypoint: npm
-    args: ['run', 'build']
+    args: ['--prefix', 'frontend/', 'run', 'build']
 
 artifacts:
   objects:
