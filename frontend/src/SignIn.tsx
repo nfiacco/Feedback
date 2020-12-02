@@ -25,7 +25,6 @@ const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffli
     console.log('Signed in as: ' + xhr.responseText);
   };
   xhr.send(JSON.stringify({'idtoken': id_token}));
-  console.log(response);
 }
 
 interface IState {
