@@ -44,10 +44,16 @@ steps:
     name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/deep-rainfall-296803/feedback', 'backend/']
 
+  - id: install-frontend
+    name: node
+    entrypoint: npm
+    args: ['install']
+
   - id: build-frontend
     name: node
     entrypoint: npm
     args: ['--prefix', 'frontend/', 'run', 'build']
+    waitFor: ['install-frontend']
 
 artifacts:
   objects:
