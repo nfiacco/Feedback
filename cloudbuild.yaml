@@ -47,7 +47,7 @@ steps:
   - id: install-frontend
     name: node
     entrypoint: npm
-    args: ['install']
+    args: ['--prefix', 'frontend/', 'install']
 
   - id: build-frontend
     name: node
