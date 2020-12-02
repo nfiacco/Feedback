@@ -57,7 +57,7 @@ steps:
 
 artifacts:
   objects:
-    location: 'gs://nf-feedback-artifacts/production'
+    location: 'gs://www.anonymousfeedback.app'
     paths: ['frontend/build/*']
 
 images: ['gcr.io/deep-rainfall-296803/feedback']
