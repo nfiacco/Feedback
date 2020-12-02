@@ -55,9 +55,9 @@ steps:
     args: ['--prefix', 'frontend/', 'run', 'build']
     waitFor: ['install-frontend']
 
-artifacts:
-  objects:
-    location: 'gs://www.anonymousfeedback.app'
-    paths: ['frontend/build/*']
+  - id: deploy-frontend
+    name: 'gcr.io/cloud-builders/gsutil'
+    entrypoint: gsutil
+    args: ['cp', '-r', 'frontend/build/*', 'gs://www.anonymousfeedback.app']
 
 images: ['gcr.io/deep-rainfall-296803/feedback']

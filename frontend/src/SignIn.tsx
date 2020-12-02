@@ -5,7 +5,7 @@ import { applyMiddleware, createStore } from "redux";
 import thunkMiddleware, { ThunkAction } from "redux-thunk";
 import { GoogleLoginResponse } from "react-google-login"
 
-const ROOT_DOMAIN = process.env.NODE_ENV === "production" ? "https://feedback-nbt4bnbhra-uw.a.run.app" : "http://localhost:8080";
+const ROOT_DOMAIN = process.env.NODE_ENV === "production" ? "https://api.anonymousfeedback.app" : "http://localhost:8080";
 
 function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
   return (response as GoogleLoginResponse).googleId !== undefined;
