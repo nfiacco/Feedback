@@ -4,11 +4,13 @@ import (
 	"feedback/internal/errors"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type ApiHandlerFunc func(http.ResponseWriter, *http.Request) error
 
 var ALLOWED_ORIGINS = []string{"https://anonymousfeedback.app", "https://www.anonymousfeedback.app"}
+var ALLOWED_HEADERS = []string{"Content-Type"}
 
 func WrapWithErrorHandling(handler ApiHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +54,7 @@ func CORSMiddleware(next http.Handler) http.Handler {
 		}
 
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", strings.Join(ALLOWED_HEADERS, ","))
 		w.Header().Set("Access-Control-Allow-Methods", "POST")
 
 		if r.Method == "OPTIONS" {
