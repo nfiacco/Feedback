@@ -5,7 +5,8 @@ import { applyMiddleware, createStore } from "redux";
 import thunkMiddleware, { ThunkAction } from "redux-thunk";
 import { GoogleLoginResponse } from "react-google-login"
 
-const ROOT_DOMAIN = process.env.NODE_ENV === "production" ? "https://api.anonymousfeedback.app" : "http://localhost:8080";
+const IS_PROD = process.env.NODE_ENV === "production";
+const ROOT_DOMAIN = IS_PROD ? "https://api.anonymousfeedback.app" : "http://localhost:8080";
 
 function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
   return (response as GoogleLoginResponse).googleId !== undefined;
@@ -21,6 +22,12 @@ const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffli
   var xhr = new XMLHttpRequest();
   xhr.open('POST', ROOT_DOMAIN + '/login');
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  
+  // enable sending cookies via CORS for development
+  if (!IS_PROD) {
+    xhr.withCredentials = true;
+  }
+
   xhr.onload = function() {
     console.log('Signed in as: ' + xhr.responseText);
   };

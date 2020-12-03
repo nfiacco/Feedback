@@ -14,8 +14,13 @@ func runServer(app *application.App) {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/hello", app.Hello).Methods("GET")
-	r.HandleFunc("/login", app.Login).Methods("POST")
+	r.Handle("/check_session", application.WrapWithErrorHandling(app.CheckSession)).Methods("GET")
+	r.Handle("/login", application.WrapWithErrorHandling(app.Login)).Methods("POST")
 	r.HandleFunc("/send", app.SendFeedback).Methods("POST")
+
+	if !application.IsProd() {
+		r.Use(application.DevCORSMiddleware)
+	}
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

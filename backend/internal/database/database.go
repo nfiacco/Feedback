@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"feedback/internal/application"
+
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 
@@ -16,7 +18,7 @@ import (
 const DB_PWD_SECRET = "projects/621422061156/secrets/cloud-sql-feedback-password/versions/latest"
 
 func InitDatabase() (*gorm.DB, error) {
-	if isProd() {
+	if application.IsProd() {
 		return initDatabaseProd()
 	} else {
 		return initDatabaseDev()
@@ -89,9 +91,4 @@ func fetchSecret(name string) (*string, error) {
 
 	secret := string(result.Payload.Data)
 	return &secret, nil
-}
-
-func isProd() bool {
-	_, isSet := os.LookupEnv("IS_PROD")
-	return isSet
 }

@@ -1,6 +1,11 @@
 package application
 
-import "gorm.io/gorm"
+import (
+	"math/rand"
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // app struct contains global state.
 type App struct {
@@ -9,5 +14,7 @@ type App struct {
 }
 
 func InitApp(db *gorm.DB) *App {
+	rand.Seed(time.Now().UTC().UnixNano())
+
 	return &App{db}
 }
