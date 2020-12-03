@@ -21,13 +21,8 @@ const responseGoogle = (response: GoogleLoginResponse | GoogleLoginResponseOffli
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', ROOT_DOMAIN + '/login');
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  
-  // enable sending cookies via CORS for development
-  if (!IS_PROD) {
-    xhr.withCredentials = true;
-  }
-
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.withCredentials = true;
   xhr.onload = function() {
     console.log('Signed in as: ' + xhr.responseText);
   };

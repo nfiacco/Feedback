@@ -8,6 +8,8 @@ import (
 
 type ApiHandlerFunc func(http.ResponseWriter, *http.Request) error
 
+var ALLOWED_ORIGINS = []string{"https://anonymousfeedback.app", "https://www.anonymousfeedback.app"}
+
 func WrapWithErrorHandling(handler ApiHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := handler(w, r)
@@ -25,13 +27,37 @@ func WrapWithErrorHandling(handler ApiHandlerFunc) http.Handler {
 	})
 }
 
-// CORSMethodMiddleware automatically sets the Access-Control-Allow-Origin and Access-Control-Allow-Credentials
-// response headers for localhost:3000 (the frontend app)
-func DevCORSMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-		w.Header().Set("Access-Control-Allow-Credentials", "http://localhost:3000")
+func isOriginAllowed(origin string) bool {
+	if origin == "null" {
+		return true
+	}
 
-		next.ServeHTTP(w, req)
+	for _, allowedOrigin := range ALLOWED_ORIGINS {
+		if origin == allowedOrigin {
+			return true
+		}
+	}
+
+	log.Printf("Origin not allowed: %s", origin)
+	return false
+}
+
+// CORSMiddleware automatically sets the Access-Control-Allow-Origin and Access-Control-Allow-Credentials
+// response headers for localhost:3000 (the frontend app)
+func CORSMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if isOriginAllowed(origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			next.ServeHTTP(w, r)
+		}
 	})
 }

@@ -18,9 +18,7 @@ func runServer(app *application.App) {
 	r.Handle("/login", application.WrapWithErrorHandling(app.Login)).Methods("POST")
 	r.HandleFunc("/send", app.SendFeedback).Methods("POST")
 
-	if !application.IsProd() {
-		r.Use(application.DevCORSMiddleware)
-	}
+	r.Use(application.CORSMiddleware)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
