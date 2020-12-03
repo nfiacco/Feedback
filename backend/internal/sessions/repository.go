@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"feedback/internal/models"
 	"fmt"
+	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -62,6 +63,8 @@ func Refresh(db *gorm.DB, session *models.Session) (*models.Session, error) {
 func LoadValidByToken(db *gorm.DB, rawToken string) (*models.Session, error) {
 	// we store hashed tokens in case the DB is leaked
 	token := hashToken(rawToken)
+	log.Printf("hashed token: %s", token)
+	log.Printf("expiration: %s", time.Now().String())
 
 	var session models.Session
 	result := db.Take(&session, "token = ? AND expiration >= ?", token, time.Now())

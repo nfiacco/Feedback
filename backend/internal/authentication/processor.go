@@ -34,5 +34,5 @@ func IsAuthenticated(db *gorm.DB, r *http.Request) (bool, error) {
 		return false, err
 	}
 
-	return err != nil, nil
+	return err == nil, nil
 }
