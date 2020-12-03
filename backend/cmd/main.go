@@ -14,8 +14,8 @@ func runServer(app *application.App) {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/hello", app.Hello).Methods("GET")
-	r.Handle("/check_session", application.WrapWithErrorHandling(app.CheckSession)).Methods("GET")
-	r.Handle("/login", application.WrapWithErrorHandling(app.Login)).Methods("POST")
+	r.Handle("/check_session", application.WrapWithErrorHandling(app.CheckSession)).Methods("GET", "OPTIONS")
+	r.Handle("/login", application.WrapWithErrorHandling(app.Login)).Methods("POST", "OPTIONS")
 	r.HandleFunc("/send", app.SendFeedback).Methods("POST")
 
 	r.Use(application.CORSMiddleware)
