@@ -15,7 +15,6 @@ import (
 )
 
 const CLIENT_ID = "621422061156-f3f0o58fonsm9ohnqq5ngpa981c6k3hc.apps.googleusercontent.com"
-const SESSION_COOKIE_NAME = "X-Session-Token"
 
 type LoginRequest struct {
 	IdToken string `json:"idtoken"`
@@ -24,17 +23,6 @@ type LoginRequest struct {
 type LoginResponse struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
-}
-
-func addCookie(w http.ResponseWriter, name string, value string) {
-	cookie := http.Cookie{
-		Name:     name,
-		Value:    value,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-	}
-	http.SetCookie(w, &cookie)
 }
 
 func validateAndParseIdToken(ctx context.Context, loginRequest LoginRequest) (*users.ExternalUserInfo, error) {
@@ -55,7 +43,7 @@ func validateAndParseIdToken(ctx context.Context, loginRequest LoginRequest) (*u
 
 func (app *App) Login(w http.ResponseWriter, r *http.Request) error {
 	session, err := authentication.Authenticate(app.db, r)
-	if err != nil && !errors.IsRecordNotFound(err) {
+	if err != nil && !errors.IsRecordNotFound(err) && !errors.IsCookieNotFound(err) {
 		return err
 	}
 
@@ -98,7 +86,7 @@ func (app *App) Login(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	addCookie(w, SESSION_COOKIE_NAME, *token)
+	authentication.AddSessionCookie(w, *token)
 	json.NewEncoder(w).Encode(LoginResponse{FirstName: externalUserInfo.FirstName, LastName: externalUserInfo.LastName})
 	return nil
 }

@@ -9,13 +9,30 @@ import (
 	"gorm.io/gorm"
 )
 
+const SESSION_COOKIE_NAME = "X-Session-Token"
+
+func addCookie(w http.ResponseWriter, name string, value string) {
+	cookie := http.Cookie{
+		Name:     name,
+		Value:    value,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(w, &cookie)
+}
+
+func AddSessionCookie(w http.ResponseWriter, token string) {
+	addCookie(w, SESSION_COOKIE_NAME, token)
+}
+
 func Authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
-	token := r.Header.Get("X-Session-Token")
-	if token == "" {
-		return nil, gorm.ErrRecordNotFound
+	cookie, err := r.Cookie(SESSION_COOKIE_NAME)
+	if err != nil {
+		return nil, err
 	}
 
-	session, err := sessions.LoadValidByToken(db, token)
+	session, err := sessions.LoadValidByToken(db, cookie.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +47,7 @@ func Authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
 
 func IsAuthenticated(db *gorm.DB, r *http.Request) (bool, error) {
 	_, err := Authenticate(db, r)
-	if err != nil && !errors.IsRecordNotFound(err) {
+	if err != nil && !errors.IsRecordNotFound(err) && !errors.IsCookieNotFound(err) {
 		return false, err
 	}
 
