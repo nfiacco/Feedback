@@ -1,14 +1,13 @@
-import { RootAction, RootState } from "app/model";
 import { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
-import { ThunkAction } from "redux-thunk";
-import { sendRequest } from 'rpc/Ajax';
-import { Login } from "rpc/Api";
+import { AsyncAction } from "src/root/model";
+import { sendRequest } from 'src/rpc/Ajax';
+import { Login } from "src/rpc/Api";
 
 function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
   return (response as GoogleLoginResponse).googleId !== undefined;
 }
 
-export function handleGoogleResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): ThunkAction<void, RootState, unknown, RootAction> {
+export function handleGoogleResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): AsyncAction {
   return async (dispatch: any) => {
     if (!isGoogleLoginResponse(response)) {
       return;

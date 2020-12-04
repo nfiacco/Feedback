@@ -1,9 +1,8 @@
-import { ThunkAction } from "redux-thunk";
-import { sendRequest } from 'rpc/Ajax';
-import { CheckSession } from 'rpc/Api';
-import { RootAction, RootState } from "./model";
+import { AsyncAction } from "src/root/model";
+import { sendRequest } from 'src/rpc/Ajax';
+import { CheckSession } from 'src/rpc/Api';
 
-export function start(): ThunkAction<void, RootState, unknown, RootAction> {
+export function start(): AsyncAction {
   return async (dispatch: any) => {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);

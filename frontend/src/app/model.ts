@@ -1,7 +1,3 @@
-import { LoginAction, loginReducer, LoginState } from "home/model";
-import { applyMiddleware, combineReducers, createStore as createReduxStore } from "redux";
-import thunkMiddleware from "redux-thunk";
-
 export type AppAction = 
 | {
   type: "loading"
@@ -18,7 +14,7 @@ export interface AppState {
   loading: boolean;
 }
 
-function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): AppState {
+export function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): AppState {
   switch (action.type) {
     case "loading":
     return {
@@ -33,19 +29,4 @@ function appReducer(state: AppState = INITIAL_APP_STATE, action: AppAction): App
     default:
     return state;
   }
-}
-
-export type RootAction = AppAction | LoginAction;
-
-export interface RootState {
-  app: AppState;
-  login: LoginState;
-}
-
-export function createStore() {
-  const middlewares = [thunkMiddleware];
-  const middlewareEnhancer = applyMiddleware(...middlewares)
-  const rootReducer = combineReducers({app: appReducer, login: loginReducer});
-
-  return createReduxStore(rootReducer, middlewareEnhancer);
 }

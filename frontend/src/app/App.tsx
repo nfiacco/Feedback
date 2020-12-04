@@ -1,15 +1,13 @@
-import { start } from "app/actions";
-import { createStore, RootState } from 'app/model';
-import { NotFound } from 'app/NotFound';
-import { Feedback } from 'feedback/Feedback';
-import { Home } from 'home/Home';
 import { useEffect } from "react";
 import { connect, Provider } from "react-redux";
 import {
-  BrowserRouter as Router,
-
-  Route, Switch
+  BrowserRouter, Route, Switch
 } from "react-router-dom";
+import { start } from "src/app/actions";
+import { NotFound } from 'src/app/NotFound';
+import { Feedback } from 'src/feedback/Feedback';
+import { Home } from 'src/home/Home';
+import { createStore, RootState } from 'src/root/model';
 import './App.css';
 
 interface AppProps {
@@ -56,9 +54,9 @@ export function App() {
 
   return (
     <Provider store={store}>
-      <Router>
+      <BrowserRouter>
         <ConnectedApp/>
-      </Router>
+      </BrowserRouter>
     </Provider>
   );
 }
