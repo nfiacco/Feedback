@@ -1,18 +1,36 @@
-package application
+package router
 
 import (
+	"feedback/internal/application"
+	"feedback/internal/auth"
 	"feedback/internal/errors"
+	"feedback/internal/handlers"
 	"log"
 	"net/http"
 	"strings"
-)
 
-type ApiHandlerFunc func(http.ResponseWriter, *http.Request) error
+	"gorm.io/gorm"
+)
 
 var ALLOWED_ORIGINS = []string{"https://anonymousfeedback.app", "https://www.anonymousfeedback.app"}
 var ALLOWED_HEADERS = []string{"Content-Type"}
 
-func WrapWithErrorHandling(handler ApiHandlerFunc) http.Handler {
+func WrapWithEnv(db *gorm.DB, handler BaseHandlerFunc) EnvHandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		auth, err := auth.GetAuthentication(db, r)
+		if err != nil {
+			return err
+		}
+
+		env := handlers.Env{
+			Db:   db,
+			Auth: *auth,
+		}
+		return handler(env, w, r)
+	}
+}
+
+func WrapWithErrorHandling(handler EnvHandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := handler(w, r)
 		if err == nil {
@@ -30,7 +48,7 @@ func WrapWithErrorHandling(handler ApiHandlerFunc) http.Handler {
 }
 
 func isOriginAllowed(origin string) bool {
-	if origin == "null" {
+	if !application.IsProd() && origin == "http://localhost:3000" {
 		return true
 	}
 
@@ -44,8 +62,7 @@ func isOriginAllowed(origin string) bool {
 	return false
 }
 
-// CORSMiddleware automatically sets the Access-Control-Allow-Origin and Access-Control-Allow-Credentials
-// response headers for localhost:3000 (the frontend app)
+// CORSMiddleware automatically sets the Access-Control-Allow-* response headers for the frontend app
 func CORSMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")

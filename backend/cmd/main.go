@@ -1,27 +1,12 @@
 package main
 
 import (
-	"feedback/internal/application"
 	"feedback/internal/database"
+	"feedback/internal/router"
 	"log"
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"math/rand"
+	"time"
 )
-
-func runServer(app *application.App) {
-	// No HTTPS needed since TLS is terminated by Google Cloud Run
-	r := mux.NewRouter()
-
-	r.HandleFunc("/hello", app.Hello).Methods("GET")
-	r.Handle("/check_session", application.WrapWithErrorHandling(app.CheckSession)).Methods("GET", "OPTIONS")
-	r.Handle("/login", application.WrapWithErrorHandling(app.Login)).Methods("POST", "OPTIONS")
-	r.HandleFunc("/send", app.SendFeedback).Methods("POST")
-
-	r.Use(application.CORSMiddleware)
-
-	log.Fatal(http.ListenAndServe(":8080", r))
-}
 
 func main() {
 
@@ -31,7 +16,7 @@ func main() {
 		return
 	}
 
-	app := application.InitApp(db)
+	rand.Seed(time.Now().UTC().UnixNano())
 
-	runServer(app)
+	router.RunServer(db)
 }

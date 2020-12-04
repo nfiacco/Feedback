@@ -1,4 +1,6 @@
+import { RootAction, RootState } from "app/model";
 import { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
+import { ThunkAction } from "redux-thunk";
 import { sendRequest } from 'rpc/Ajax';
 import { Login } from "rpc/Api";
 
@@ -6,13 +8,18 @@ function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginRespon
   return (response as GoogleLoginResponse).googleId !== undefined;
 }
 
-export const handleGoogleResponse = async (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-  if (!isGoogleLoginResponse(response)) {
-    return;
-  }
+export function handleGoogleResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): ThunkAction<void, RootState, unknown, RootAction> {
+  return async (dispatch: any) => {
+    if (!isGoogleLoginResponse(response)) {
+      return;
+    }
 
-  const id_token = response.getAuthResponse().id_token;
-  const payload = {'idtoken': id_token};
-  const loginResponse = await sendRequest(Login, payload);
-  console.log(JSON.stringify(loginResponse));
+    const id_token = response.getAuthResponse().id_token;
+    const payload = {'idtoken': id_token};
+    const loginResponse = await sendRequest(Login, payload);
+    dispatch({
+      type: "login.authenticated",
+      feedbackKey: loginResponse.feedback_key,
+    });
+  };
 }

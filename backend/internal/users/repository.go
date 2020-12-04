@@ -23,6 +23,11 @@ type ExternalUserInfo struct {
 	LastName   string
 }
 
+type UserAndIdentity struct {
+	*models.User
+	*models.UserIdentity
+}
+
 // Generates a mostly-unique 8 character string. Must check DB since collisions are possible
 // There is a race condition here, since the unique key can be used by another concurrent
 // process. In this case, it is ok to error since this is extremely rare.
@@ -57,15 +62,17 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 	return &user, nil
 }
 
-func LoadBySession(db *gorm.DB, session *models.Session) (*models.User, error) {
-	var user models.User
-	result := db.Take(&user, "user_id = ?", session.UserID)
-
+func LoadUserAndIdentityByID(db *gorm.DB, userID int64) (*UserAndIdentity, error) {
+	var userAndIdentity UserAndIdentity
+	result := db.Table("users").
+		Joins("JOIN user_identities ON user_identities.user_id = users.id").
+		Where("users.id = ?", userID).
+		Take(&userAndIdentity)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &user, nil
+	return &userAndIdentity, nil
 }
 
 func LoadByFeedbackKey(db *gorm.DB, feedbackKey string) (*models.User, error) {

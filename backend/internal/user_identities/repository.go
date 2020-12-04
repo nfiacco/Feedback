@@ -6,16 +6,6 @@ import (
 	"gorm.io/gorm"
 )
 
-func LoadByUserID(db *gorm.DB, userID int64) (*models.UserIdentity, error) {
-	var userIdentity models.UserIdentity
-	result := db.Take(&userIdentity, "user_id = ?", userID)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-
-	return &userIdentity, nil
-}
-
 func Create(db *gorm.DB, firstName string, lastName string, userID int64) (*models.UserIdentity, error) {
 	userIdentity := models.UserIdentity{
 		FirstName: firstName,

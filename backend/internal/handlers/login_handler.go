@@ -1,12 +1,10 @@
-package application
+package handlers
 
 import (
 	"context"
 	"encoding/json"
-	"feedback/internal/authentication"
-	"feedback/internal/errors"
+	"feedback/internal/auth"
 	"feedback/internal/sessions"
-	"feedback/internal/user_identities"
 	"feedback/internal/users"
 	"log"
 	"net/http"
@@ -21,8 +19,9 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	FeedbackKey string `json:"feedback_key"`
 }
 
 func validateAndParseIdToken(ctx context.Context, loginRequest LoginRequest) (*users.ExternalUserInfo, error) {
@@ -41,26 +40,25 @@ func validateAndParseIdToken(ctx context.Context, loginRequest LoginRequest) (*u
 	}, nil
 }
 
-func (app *App) Login(w http.ResponseWriter, r *http.Request) error {
-	session, err := authentication.Authenticate(app.db, r)
-	if err != nil && !errors.IsRecordNotFound(err) && !errors.IsCookieNotFound(err) {
-		return err
-	}
-
-	if err == nil {
+func Login(env Env, w http.ResponseWriter, r *http.Request) error {
+	if env.Auth.IsAuthenticated {
 		log.Printf("already authed")
-		userIdentity, err := user_identities.LoadByUserID(app.db, session.UserID)
+		userAndIdentity, err := users.LoadUserAndIdentityByID(env.Db, env.Auth.Session.UserID)
 		if err != nil {
 			return err
 		}
 
-		json.NewEncoder(w).Encode(LoginResponse{FirstName: userIdentity.FirstName, LastName: userIdentity.LastName})
+		json.NewEncoder(w).Encode(LoginResponse{
+			FirstName:   userAndIdentity.FirstName,
+			LastName:    userAndIdentity.LastName,
+			FeedbackKey: userAndIdentity.FeedbackKey,
+		})
 		return nil
 	}
 
 	decoder := json.NewDecoder(r.Body)
 	var loginRequest LoginRequest
-	err = decoder.Decode(&loginRequest)
+	err := decoder.Decode(&loginRequest)
 	if err != nil {
 		return err
 	}
@@ -71,7 +69,7 @@ func (app *App) Login(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	user, err := users.GetOrCreateUser(app.db, externalUserInfo)
+	user, err := users.GetOrCreateUser(env.Db, externalUserInfo)
 	if err != nil {
 		return err
 	}
@@ -81,12 +79,16 @@ func (app *App) Login(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	_, err = sessions.Create(app.db, *token, user.ID)
+	_, err = sessions.Create(env.Db, *token, user.ID)
 	if err != nil {
 		return err
 	}
 
-	authentication.AddSessionCookie(w, *token)
-	json.NewEncoder(w).Encode(LoginResponse{FirstName: externalUserInfo.FirstName, LastName: externalUserInfo.LastName})
+	auth.AddSessionCookie(w, *token)
+	json.NewEncoder(w).Encode(LoginResponse{
+		FirstName:   externalUserInfo.FirstName,
+		LastName:    externalUserInfo.LastName,
+		FeedbackKey: user.FeedbackKey,
+	})
 	return nil
 }

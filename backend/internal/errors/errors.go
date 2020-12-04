@@ -2,6 +2,7 @@ package errors
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -14,6 +15,10 @@ type HttpError struct {
 
 func (e HttpError) Error() string {
 	return e.Err.Error()
+}
+
+func Wrap(err error, message string) error {
+	return fmt.Errorf("%s: %w", message, err)
 }
 
 func IsRecordNotFound(err error) bool {

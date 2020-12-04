@@ -1,23 +1,19 @@
-import { AppAction, AppState } from "app/model";
 import { ThunkAction } from "redux-thunk";
 import { sendRequest } from 'rpc/Ajax';
 import { CheckSession } from 'rpc/Api';
+import { RootAction, RootState } from "./model";
 
-export function start(): ThunkAction<void, AppState, unknown, AppAction> {
+export function start(): ThunkAction<void, RootState, unknown, RootAction> {
   return async (dispatch: any) => {
-    const isAuthenticated = await checkSession();
-    if (isAuthenticated) {
-      dispatch({type: "login.authenticated"});
+    try {
+      const checkSessionResponse = await sendRequest(CheckSession);
+      dispatch({
+        type: "login.authenticated",
+        feedbackKey: checkSessionResponse.feedback_key,
+      });
+    } catch (e) {
     }
+
     dispatch({type: "done"});
   };
-}
-
-async function checkSession(): Promise<boolean> {
-  try {
-    await sendRequest(CheckSession);
-    return true;
-  } catch (e) {
-    return false;
-  }
 }

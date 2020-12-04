@@ -1,4 +1,4 @@
-package authentication
+package auth
 
 import (
 	"feedback/internal/errors"
@@ -26,8 +26,7 @@ func AddSessionCookie(w http.ResponseWriter, token string) {
 	addCookie(w, SESSION_COOKIE_NAME, token)
 }
 
-// todo: implement as middleware, pass auth object to handler. it should have "isAuthed: bool"
-func Authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
+func authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
 	cookie, err := r.Cookie(SESSION_COOKIE_NAME)
 	if err != nil {
 		return nil, err
@@ -46,11 +45,14 @@ func Authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
 	return refreshed, nil
 }
 
-func IsAuthenticated(db *gorm.DB, r *http.Request) (bool, error) {
-	_, err := Authenticate(db, r)
+func GetAuthentication(db *gorm.DB, r *http.Request) (*Authentication, error) {
+	session, err := authenticate(db, r)
 	if err != nil && !errors.IsRecordNotFound(err) && !errors.IsCookieNotFound(err) {
-		return false, err
+		return nil, errors.Wrap(err, "Unexpected error checking authentication")
 	}
 
-	return err == nil, nil
+	return &Authentication{
+		Session:         session,
+		IsAuthenticated: err == nil,
+	}, nil
 }
