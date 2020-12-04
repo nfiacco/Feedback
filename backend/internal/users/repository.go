@@ -65,6 +65,7 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 func LoadUserAndIdentityByID(db *gorm.DB, userID int64) (*UserAndIdentity, error) {
 	var userAndIdentity UserAndIdentity
 	result := db.Table("users").
+		Select("users.*, user_identities.*").
 		Joins("JOIN user_identities ON user_identities.user_id = users.id").
 		Where("users.id = ?", userID).
 		Take(&userAndIdentity)
