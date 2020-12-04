@@ -3,7 +3,6 @@ package application
 import (
 	"feedback/internal/authentication"
 	"feedback/internal/errors"
-	"fmt"
 	"net/http"
 )
 
@@ -17,6 +16,6 @@ func (app *App) CheckSession(w http.ResponseWriter, r *http.Request) error {
 		return errors.HttpError{Code: http.StatusUnauthorized, Err: err}
 	}
 
-	fmt.Fprintf(w, "Success!")
+	w.WriteHeader(http.StatusOK)
 	return nil
 }

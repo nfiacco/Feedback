@@ -26,6 +26,7 @@ func AddSessionCookie(w http.ResponseWriter, token string) {
 	addCookie(w, SESSION_COOKIE_NAME, token)
 }
 
+// todo: implement as middleware, pass auth object to handler. it should have "isAuthed: bool"
 func Authenticate(db *gorm.DB, r *http.Request) (*models.Session, error) {
 	cookie, err := r.Cookie(SESSION_COOKIE_NAME)
 	if err != nil {
