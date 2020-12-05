@@ -1,5 +1,5 @@
 import { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
-import { AsyncAction } from "src/root/model";
+import { useRootDispatch } from "src/root/model";
 import { sendRequest } from 'src/rpc/Ajax';
 import { Login } from "src/rpc/Api";
 
@@ -7,8 +7,11 @@ function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginRespon
   return (response as GoogleLoginResponse).googleId !== undefined;
 }
 
-export function handleGoogleResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): AsyncAction {
-  return async (dispatch: any) => {
+export type GoogleLoginHandler = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => void;
+
+export function useHandleGoogleResponse(): GoogleLoginHandler {
+  const dispatch = useRootDispatch();
+  return async (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
     if (!isGoogleLoginResponse(response)) {
       return;
     }

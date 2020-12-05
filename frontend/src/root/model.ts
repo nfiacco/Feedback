@@ -1,5 +1,6 @@
-import { applyMiddleware, combineReducers, createStore as createReduxStore } from "redux";
-import thunkMiddleware, { ThunkAction } from "redux-thunk";
+import { Dispatch } from "react";
+import { useDispatch } from "react-redux";
+import { combineReducers, createStore as createReduxStore } from "redux";
 import { AppAction, appReducer, AppState } from "src/app/model";
 import { LoginAction, loginReducer, LoginState } from "src/home/model";
 
@@ -10,12 +11,10 @@ export interface RootState {
   login: LoginState;
 }
 
-export type AsyncAction = ThunkAction<void, RootState, unknown, RootAction>;
+export const useRootDispatch = () => useDispatch<Dispatch<RootAction>>();
 
 export function createStore() {
-  const middlewares = [thunkMiddleware];
-  const middlewareEnhancer = applyMiddleware(...middlewares)
   const rootReducer = combineReducers({app: appReducer, login: loginReducer});
 
-  return createReduxStore(rootReducer, middlewareEnhancer);
+  return createReduxStore(rootReducer);
 }

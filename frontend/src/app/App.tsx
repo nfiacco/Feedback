@@ -1,31 +1,30 @@
 import { useEffect } from "react";
-import { connect, Provider } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   BrowserRouter, Route, Switch
 } from "react-router-dom";
-import { start } from "src/app/actions";
 import { NotFound } from 'src/app/NotFound';
 import { Feedback } from 'src/feedback/Feedback';
 import { Home } from 'src/home/Home';
-import { createStore, RootState } from 'src/root/model';
+import { RootState } from 'src/root/model';
+import { useStart } from "./actions";
 import './App.css';
 
-interface AppProps {
-  loading: boolean,
-  start: () => void;
-}
+export const App: React.FC = () => {
+  const loading = useSelector((state: RootState) => state.app.loading);
+  const start = useStart();
 
-const AppImpl: React.FC<AppProps> = props => {
   useEffect(() => {
-    props.start();
+    start();
   });
 
-  if (props.loading) {
-    return <div>Loading!</div>
+  if (loading) {
+    return <div></div>
   }
 
   return (
-    <Switch>
+    <BrowserRouter>
+      <Switch>
       <Route exact path='/'>
         <Home/>
       </Route>
@@ -36,27 +35,6 @@ const AppImpl: React.FC<AppProps> = props => {
         <NotFound/>
       </Route>
     </Switch>
-  );
-}
-
-const Connector = connect(
-  (state: RootState) => ({
-    loading: state.app.loading,
-  }),
-  {
-    start: start,
-  }
-);
-const ConnectedApp = Connector(AppImpl);
-
-export function App() {
-  const store = createStore();
-
-  return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <ConnectedApp/>
-      </BrowserRouter>
-    </Provider>
+    </BrowserRouter>
   );
 }

@@ -13,6 +13,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 const DB_PWD_SECRET = "projects/621422061156/secrets/cloud-sql-feedback-password/versions/latest"
@@ -57,7 +58,9 @@ func initDatabaseProd() (*gorm.DB, error) {
 	var dbURI string
 	dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", dbUser, *dbPwd, dbName, socketDir, instanceConnectionName)
 
-	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dbURI), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open: %v", err)
 	}

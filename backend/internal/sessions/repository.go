@@ -12,7 +12,8 @@ import (
 )
 
 const TOKEN_BITS = 256
-const SESSION_EXPIRATION = time.Duration(15) * time.Minute
+const DAY = time.Duration(24) * time.Hour
+const SESSION_EXPIRATION = time.Duration(14) * DAY
 
 func GenerateToken() (*string, error) {
 	b := make([]byte, TOKEN_BITS/8)
