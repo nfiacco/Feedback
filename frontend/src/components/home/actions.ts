@@ -1,7 +1,7 @@
 import { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { useDispatch } from "src/root/model";
-import { sendRequest } from 'src/rpc/Ajax';
-import { Login } from "src/rpc/Api";
+import { sendRequest } from 'src/rpc/ajax';
+import { Login } from "src/rpc/api";
 
 function isGoogleLoginResponse(response: GoogleLoginResponse | GoogleLoginResponseOffline): response is GoogleLoginResponse {
   return (response as GoogleLoginResponse).googleId !== undefined;

@@ -1,4 +1,4 @@
-import { IEndpoint } from 'src/rpc/Api';
+import { IEndpoint } from 'src/rpc/api';
 
 const IS_PROD = process.env.NODE_ENV === "production";
 const ROOT_DOMAIN = IS_PROD ? "https://api.anonymousfeedback.app" : "http://localhost:8080";
