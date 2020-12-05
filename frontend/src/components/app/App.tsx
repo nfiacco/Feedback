@@ -1,17 +1,15 @@
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import {
   BrowserRouter, Route, Switch
 } from "react-router-dom";
-import { NotFound } from 'src/app/NotFound';
-import { Feedback } from 'src/feedback/Feedback';
-import { Home } from 'src/home/Home';
-import { RootState } from 'src/root/model';
+import { Feedback } from 'src/components/feedback/Feedback';
+import { Home } from 'src/components/home/Home';
+import { NotFound } from 'src/components/NotFound';
+import { useSelector } from "src/root/model";
 import { useStart } from "./actions";
-import './App.css';
 
 export const App: React.FC = () => {
-  const loading = useSelector((state: RootState) => state.app.loading);
+  const loading = useSelector(state => state.app.loading);
   const start = useStart();
 
   useEffect(() => {
@@ -19,7 +17,7 @@ export const App: React.FC = () => {
   });
 
   if (loading) {
-    return <div></div>
+    return <div/>
   }
 
   return (
@@ -28,7 +26,7 @@ export const App: React.FC = () => {
       <Route exact path='/'>
         <Home/>
       </Route>
-      <Route path='/:id'>
+      <Route path='/feedback/:id'>
         <Feedback/>
       </Route>
       <Route path='/'>

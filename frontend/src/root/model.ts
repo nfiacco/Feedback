@@ -1,8 +1,8 @@
 import { Dispatch } from "react";
-import { useDispatch } from "react-redux";
+import { createSelectorHook, useDispatch as useReactDispatch } from "react-redux";
 import { combineReducers, createStore as createReduxStore } from "redux";
-import { AppAction, appReducer, AppState } from "src/app/model";
-import { LoginAction, loginReducer, LoginState } from "src/home/model";
+import { AppAction, appReducer, AppState } from "src/components/app/model";
+import { LoginAction, loginReducer, LoginState } from "src/components/home/model";
 
 export type RootAction = AppAction | LoginAction;
 
@@ -11,7 +11,8 @@ export interface RootState {
   login: LoginState;
 }
 
-export const useRootDispatch = () => useDispatch<Dispatch<RootAction>>();
+export const useDispatch = () => useReactDispatch<Dispatch<RootAction>>();
+export const useSelector = createSelectorHook<RootState>();
 
 export function createStore() {
   const rootReducer = combineReducers({app: appReducer, login: loginReducer});

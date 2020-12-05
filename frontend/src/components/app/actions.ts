@@ -1,9 +1,9 @@
-import { useRootDispatch } from 'src/root/model';
+import { useDispatch } from 'src/root/model';
 import { sendRequest } from 'src/rpc/Ajax';
 import { CheckSession } from 'src/rpc/Api';
 
 export function useStart() {
-  const dispatch = useRootDispatch();
+  const dispatch = useDispatch();
   return async () => {
     try {
       const checkSessionResponse = await sendRequest(CheckSession);
