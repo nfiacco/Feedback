@@ -14,8 +14,13 @@ export const CheckSession: IEndpoint<undefined, CheckSessionResponse> = {
     path: "/check_session",
 };
 
+export const CheckKey: IEndpoint<{key: string}, undefined> = {
+    method: "GET",
+    path: "/check_key/:key",
+};
+
 export interface LoginRequest {
-    idtoken: string;
+    id_token: string;
 }
 
 export interface LoginResponse {

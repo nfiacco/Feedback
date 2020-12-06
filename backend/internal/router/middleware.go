@@ -37,11 +37,11 @@ func WrapWithErrorHandling(handler EnvHandlerFunc) http.Handler {
 			return
 		}
 
-		log.Printf("Error: %+v", err)
 		switch e := err.(type) {
 		case errors.HttpError:
-			http.Error(w, e.Error(), e.Code)
+			http.Error(w, e.ClientVisibleData, e.Code)
 		default:
+			log.Printf("Unexpected error: %+v", err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 	})

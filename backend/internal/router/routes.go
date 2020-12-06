@@ -18,16 +18,16 @@ type Route struct {
 
 var Routes = []Route{
 	Route{
-		Name:        "Hello",
-		Method:      "GET",
-		Pattern:     "/hello",
-		HandlerFunc: handlers.Hello,
-	},
-	Route{
 		Name:        "Check session",
 		Method:      "GET",
 		Pattern:     "/check_session",
 		HandlerFunc: handlers.CheckSession,
+	},
+	Route{
+		Name:        "Check feedback key",
+		Method:      "GET",
+		Pattern:     "/check_key/{key}",
+		HandlerFunc: handlers.CheckKey,
 	},
 	Route{
 		Name:        "Login",

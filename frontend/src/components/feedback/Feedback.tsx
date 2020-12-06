@@ -1,17 +1,28 @@
-import { useParams } from "react-router-dom";
+import React from "react";
+import { Link, useParams } from "react-router-dom";
+import { useCheckKey } from "src/components/feedback/actions";
+import { NotFound } from "src/components/NotFound";
 
 interface RouteParams {
-  id: string;
+  key: string;
 }
 
 export const Feedback: React.FC = () => {
-  let { id } = useParams<RouteParams>();
+  const { key } = useParams<RouteParams>();
+  const { keyValid, loading } = useCheckKey(key);
 
-  // check if the feedback key is valid, if not then redirect to not found page.
-  // no need for redux state for this, just use local state
+  if (loading) {
+    return <></>
+  }
+
+  if (!keyValid) {
+    return <NotFound/>
+  }
+
   return (
     <div>
-      <h3>ID: {id}</h3>
+      <Link to={"/"} >Home</Link>
+      <h3>Key: {key}</h3>
     </div>
   );
 }

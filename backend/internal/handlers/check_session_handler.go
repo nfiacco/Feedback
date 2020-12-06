@@ -23,10 +23,9 @@ func CheckSession(env Env, w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	json.NewEncoder(w).Encode(CheckSessionResponse{
+	return json.NewEncoder(w).Encode(CheckSessionResponse{
 		FirstName:   userAndIdentity.FirstName,
 		LastName:    userAndIdentity.LastName,
 		FeedbackKey: userAndIdentity.FeedbackKey,
 	})
-	return nil
 }

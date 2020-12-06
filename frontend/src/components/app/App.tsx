@@ -14,7 +14,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     start();
-  });
+  }, []);
 
   if (loading) {
     return <div data-testid="loading"/>
@@ -26,10 +26,10 @@ export const App: React.FC = () => {
       <Route exact path='/'>
         <Home/>
       </Route>
-      <Route path='/feedback/:id'>
+      <Route path='/feedback/:key'>
         <Feedback/>
       </Route>
-      <Route path='/'>
+      <Route path='*'>
         <NotFound/>
       </Route>
     </Switch>

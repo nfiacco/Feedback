@@ -9,12 +9,17 @@ import (
 )
 
 type HttpError struct {
-	Code int
-	Err  error
+	Code              int
+	ClientVisibleData string
 }
 
 func (e HttpError) Error() string {
-	return e.Err.Error()
+	return e.ClientVisibleData
+}
+
+var NotFound = HttpError{
+	Code:              http.StatusNotFound,
+	ClientVisibleData: http.StatusText(http.StatusNotFound),
 }
 
 func Wrap(err error, message string) error {

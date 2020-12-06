@@ -1,19 +1,24 @@
+import { compile } from 'path-to-regexp';
 import { IEndpoint } from 'src/rpc/api';
 
 const IS_PROD = process.env.NODE_ENV === "production";
 const ROOT_DOMAIN = IS_PROD ? "https://api.anonymousfeedback.app" : "http://localhost:8080";
 
-export async function sendRequest<RequestType, ResponseType>(
+export async function sendRequest<RequestType extends object, ResponseType>(
     endpoint: IEndpoint<RequestType, ResponseType>,
     payload?: RequestType,
 ): Promise<ResponseType> {
-    const url = ROOT_DOMAIN + endpoint.path;
+    const toPath = compile(endpoint.path);
+    const path = toPath(payload);
+
+    const url = ROOT_DOMAIN + path;
     let options: RequestInit = {
         method: endpoint.method,
         headers: new Headers({'Content-Type': 'application/json'}),
         credentials: 'include',
     };
-    if (payload) {
+
+    if (endpoint.method === "POST") {
         options.body = JSON.stringify(payload);
     }
 

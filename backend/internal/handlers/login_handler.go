@@ -15,7 +15,7 @@ import (
 const CLIENT_ID = "621422061156-f3f0o58fonsm9ohnqq5ngpa981c6k3hc.apps.googleusercontent.com"
 
 type LoginRequest struct {
-	IdToken string `json:"idtoken"`
+	IdToken string `json:"id_token"`
 }
 
 type LoginResponse struct {
@@ -31,6 +31,9 @@ func validateAndParseIdToken(ctx context.Context, loginRequest LoginRequest) (*u
 	}
 
 	payload, err := validator.Validate(ctx, loginRequest.IdToken, CLIENT_ID)
+	if err != nil {
+		return nil, err
+	}
 
 	return &users.ExternalUserInfo{
 		ExternalID: payload.Subject,
@@ -48,12 +51,11 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
-		json.NewEncoder(w).Encode(LoginResponse{
+		return json.NewEncoder(w).Encode(LoginResponse{
 			FirstName:   userAndIdentity.FirstName,
 			LastName:    userAndIdentity.LastName,
 			FeedbackKey: userAndIdentity.FeedbackKey,
 		})
-		return nil
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -85,10 +87,9 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	auth.AddSessionCookie(w, *token)
-	json.NewEncoder(w).Encode(LoginResponse{
+	return json.NewEncoder(w).Encode(LoginResponse{
 		FirstName:   externalUserInfo.FirstName,
 		LastName:    externalUserInfo.LastName,
 		FeedbackKey: user.FeedbackKey,
 	})
-	return nil
 }
