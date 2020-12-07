@@ -16,7 +16,7 @@ export const Home: React.FC = () => {
       {isAuthenticated ? (
         <>
           <div>You are logged in.</div>
-          <Link to={"/feedback/" + feedbackKey} >My Feedback Link</Link>
+          <Link to={"/feedback/" + feedbackKey}>My Feedback Link</Link>
         </>
       ): (
         <GoogleLogin

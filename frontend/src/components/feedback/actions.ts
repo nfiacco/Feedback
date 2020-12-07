@@ -5,19 +5,28 @@ import { CheckKey } from "src/rpc/api";
 export const useCheckKey = (key: string): {keyValid: boolean, loading: boolean} => {
   const [loading, setLoading] = useState(true);
   const [keyValid, setKeyValid] = useState(false);
+  let isCancelled = false;
 
   const checkKey = async () => {
+    let keyValid;
     try {
       await sendRequest(CheckKey, { key });
-      setKeyValid(true);
+      keyValid = true;
     } catch(e) {
+      keyValid = false;
     }
-    setLoading(false);
+
+    if (!isCancelled) {
+      setKeyValid(keyValid);
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     checkKey()
-  }, []);
+
+    return () => { isCancelled = true };
+  }, [key]);
 
   return { keyValid, loading }
 }
