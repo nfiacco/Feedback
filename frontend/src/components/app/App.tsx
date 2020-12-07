@@ -14,7 +14,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     start();
-  }, []);
+  }, [start]);
 
   if (loading) {
     return <div data-testid="loading"/>

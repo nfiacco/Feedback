@@ -1,3 +1,21 @@
-.form {
+.label {
     display: block;
+    margin: 10px auto 0;
+    text-align: center;
+}
+
+.textInput {
+    display: block;
+    margin: 10px auto 0 !important;
+    width: 80vw;
+    height: 75vh;
+    resize: none;
+}
+
+.submitButton {
+    display: block;
+    margin: 20px auto 0;
+    width: 200px;
+    height: 30px;
+    font-size: 20px;
 }
