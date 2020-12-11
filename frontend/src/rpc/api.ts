@@ -19,6 +19,16 @@ export const CheckKey: IEndpoint<{key: string}, undefined> = {
     path: "/check_key/:key",
 };
 
+export const SendFeedback: IEndpoint<SendRequest, undefined> = {
+    method: "POST",
+    path: "/send",
+};
+
+export interface SendRequest {
+    feedback_key: string;
+    escaped_content: string;
+}
+
 export interface LoginRequest {
     id_token: string;
 }

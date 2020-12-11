@@ -17,7 +17,7 @@ export function useHandleGoogleResponse(): GoogleLoginHandler {
     }
 
     const id_token = response.getAuthResponse().id_token;
-    const payload = {'id_token': id_token};
+    const payload = {"id_token": id_token};
     const loginResponse = await sendRequest(Login, payload);
     dispatch({
       type: "login.authenticated",

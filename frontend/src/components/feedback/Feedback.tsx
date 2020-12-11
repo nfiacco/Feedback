@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Link, useParams } from "react-router-dom";
-import { useCheckKey } from "src/components/feedback/actions";
+import { useCheckKey, useSendFeedback } from "src/components/feedback/actions";
 import { NotFound } from "src/components/NotFound";
 import styles from "./feedback.m.css";
 
@@ -14,15 +14,38 @@ export const Feedback: React.FC = () => {
   const { key } = useParams<RouteParams>();
   const { keyValid, loading } = useCheckKey(key);
   const [ inputText, setInputText ] = useState("");
+  const { sendFeedback, sendStatus, clearSendStatus } = useSendFeedback(key, inputText);
 
-  // TODO: on submit, redirect to page "your feedback has been sent. write more?" so that they don't click multiple times
-  // TODO: also add a debouncer maybe
-  const onSubmit = () => {
-    console.log("submitted: " + inputText);
+  const sendMore = () => {
+    setInputText("");
+    clearSendStatus();
   }
 
   if (loading) {
     return <></>
+  }
+
+  if (sendStatus === "SENDING") {
+    return <div>Sending!</div>
+  }
+
+  if (sendStatus === "SENT") {
+    return (
+      <>
+        <div>Sent!</div>
+        <a type="button" onClick={sendMore}>Send more?</a>
+      </>
+    )
+  }
+
+  if (sendStatus === "ERROR") {
+    return (
+      <>
+        <div>An Error Occurred!</div>
+        {/* Don't clear the input text if an error happens, we want the user to have a chance to get their input back. */}
+        <a type="button" onClick={clearSendStatus}>Try Again?</a>
+      </>
+    )
   }
 
   if (!keyValid) {
@@ -36,7 +59,7 @@ export const Feedback: React.FC = () => {
         Enter your feedback
       </label>
       <ReactQuill className={styles.textInput} theme="snow" value={inputText} onChange={setInputText}/>
-      <button className={styles.submitButton} onClick={onSubmit}>Send</button>
+      <button className={styles.submitButton} onClick={sendFeedback}>Send</button>
     </div>
   );
 }
