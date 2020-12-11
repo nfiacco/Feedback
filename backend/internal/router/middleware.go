@@ -48,7 +48,7 @@ func WrapWithErrorHandling(handler EnvHandlerFunc) http.Handler {
 }
 
 func isOriginAllowed(origin string) bool {
-	if !application.IsProd() && origin == "http://localhost:3000" {
+	if !application.IsProd() {
 		return true
 	}
 

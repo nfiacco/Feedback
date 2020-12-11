@@ -10,19 +10,19 @@ import (
 
 func RunServer(db *gorm.DB) {
 	// No HTTPS needed since TLS is terminated by Google Cloud Run
-	r := mux.NewRouter()
+	router := mux.NewRouter()
 
-	generateRoutes(db, r)
+	generateRoutes(db, router)
 
-	r.Use(CORSMiddleware)
+	router.Use(CORSMiddleware)
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func generateRoutes(db *gorm.DB, r *mux.Router) {
 	for _, route := range Routes {
-		withDb := WrapWithEnv(db, route.HandlerFunc)
-		withErrorHandling := WrapWithErrorHandling(withDb)
+		withEnv := WrapWithEnv(db, route.HandlerFunc)
+		withErrorHandling := WrapWithErrorHandling(withEnv)
 		r.Handle(route.Pattern, withErrorHandling).Methods(route.Method, "OPTIONS")
 	}
 }
