@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter, Route, Switch
 } from "react-router-dom";
+import { About } from "src/components/about/About";
 import { useStart } from "src/components/app/actions";
 import { Feedback } from 'src/components/feedback/Feedback';
+import { Header } from "src/components/header/Header";
 import { Home } from 'src/components/home/Home';
 import { NotFound } from 'src/components/NotFound';
 import { useSelector } from "src/root/model";
@@ -22,17 +24,21 @@ export const App: React.FC = () => {
 
   return (
     <BrowserRouter>
+      <Header/>
       <Switch>
-      <Route exact path='/'>
-        <Home/>
-      </Route>
-      <Route path='/feedback/:key'>
-        <Feedback/>
-      </Route>
-      <Route path='*'>
-        <NotFound/>
-      </Route>
-    </Switch>
+        <Route exact path='/'>
+          <Home/>
+        </Route>
+        <Route path='/about'>
+          <About/>
+        </Route>
+        <Route path='/feedback/:key'>
+          <Feedback/>
+        </Route>
+        <Route path='*'>
+          <NotFound/>
+        </Route>
+      </Switch>
     </BrowserRouter>
   );
 }

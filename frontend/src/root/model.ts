@@ -2,7 +2,7 @@ import { Dispatch } from "react";
 import { createSelectorHook, useDispatch as useReactDispatch } from "react-redux";
 import { combineReducers, createStore as createReduxStore } from "redux";
 import { AppAction, appReducer, AppState } from "src/components/app/model";
-import { LoginAction, loginReducer, LoginState } from "src/components/home/model";
+import { LoginAction, loginReducer, LoginState } from "src/components/login/model";
 
 export type RootAction = AppAction | LoginAction;
 

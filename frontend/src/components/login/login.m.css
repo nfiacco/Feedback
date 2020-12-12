@@ -1,0 +1,49 @@
+.center {
+    text-align: center;
+}
+
+.loginContainer {
+    margin:30px;
+}
+
+.header {
+    margin-top: 10px;
+}
+
+.loginLabel {
+    margin-top: 25px;
+}
+
+.buttonWrapper {
+    margin-top: 50px;
+}
+
+.loginButton {
+    color: #404040;
+    font-size: 16px;
+    font-weight: 550;
+    padding: 10px 16px;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: all .1s ease-in-out;
+}
+
+.loginButton:hover {
+    transform: scale(1.03);
+}
+
+.buttonContentWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconWrapper {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    margin-right: 12px;
+}

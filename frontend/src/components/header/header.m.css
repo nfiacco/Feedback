@@ -1,0 +1,6 @@
+.headerContainer {
+    font-size: 18px;
+    display: grid;
+    padding: 24px 48px;
+    align-items: center;
+}
