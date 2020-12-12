@@ -8,7 +8,7 @@ export const About: React.FC = () => {
         I made this for fun.
       </div>
       <div className={styles.body}>
-        <img src={image} alt="loading..." />
+        <img className={styles.image} src={image} alt="loading..." />
       </div>
     </>
   );
