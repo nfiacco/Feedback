@@ -1,5 +1,6 @@
 .modal {
     position: fixed;
+    z-index: 99;
     top: 0;
     left: 0;
     width:100%;
@@ -10,8 +11,8 @@
 .modalMain {
     position:fixed;
     background: white;
-    width: 400px;
-    height: auto;
+    display: flex;
+    flex-direction: column;
     top:50%;
     left:50%;
     transform: translate(-50%,-50%);
@@ -31,7 +32,7 @@
 }
 
 .closeButton {
-    margin: 40px auto 30px;
+    margin: 5px 0 30px;
     background-color: transparent;
     border: none;
     border-radius: 20px;

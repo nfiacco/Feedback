@@ -1,34 +1,53 @@
+import { CircularProgress } from "@material-ui/core";
 import classNames from "classnames";
-import React from "react";
-import GoogleLogin from "react-google-login";
+import React, { useState } from "react";
+import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { useHandleGoogleResponse } from "./actions";
 import styles from "./login.m.css";
 
 const GOOGLE_CLIENT_ID = "621422061156-f3f0o58fonsm9ohnqq5ngpa981c6k3hc.apps.googleusercontent.com";
 
-export const Login: React.FC = () => {
+interface LoginProps {
+  closeModal: () => void;
+}
+
+export const Login: React.FC<LoginProps> = props => {
+  const [ loading, setLoading ] = useState(false);
   const handleGoogleResponse = useHandleGoogleResponse();
+  const onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+    handleGoogleResponse(response);
+    props.closeModal();
+  }
 
   return (
     <div className={styles.loginContainer}>
-      <h2 className={classNames(styles.center, styles.header)}>Anonymous Feedback</h2>
-      <div className={classNames(styles.center, styles.loginLabel)}>
-        Sign up to start getting feedback!
-      </div>
-      <div className={classNames(styles.center, styles.buttonWrapper)}>
-        <GoogleLogin
-          clientId={GOOGLE_CLIENT_ID}
-          onSuccess={handleGoogleResponse}
-          render={renderProps => renderGoogleButton(renderProps.onClick)}
-        />
-      </div>
+      {loading ? (
+        <div className={styles.loadingContainer}>
+          <CircularProgress className={styles.spinner}/>
+        </div>
+      ) : (
+        <>
+          <h2 className={classNames(styles.center, styles.header)}>Anonymous Feedback</h2>
+          <div className={classNames(styles.center, styles.loginLabel)}>
+            Sign up to start getting feedback!
+          </div>
+          <div className={classNames(styles.center, styles.buttonWrapper)}>
+            <GoogleLogin
+              clientId={GOOGLE_CLIENT_ID}
+              onSuccess={onSuccess}
+              render={renderProps => renderGoogleButton(()=>{setLoading(true); renderProps.onClick();})}
+              onFailure={()=>setLoading(false)}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
 const renderGoogleButton = (onClick: () => void) => {
   return (
-    <button className={styles.loginButton}>
+    <button className={styles.loginButton} onClick={onClick}>
       <div className={styles.buttonContentWrapper}>
         <span className={styles.iconWrapper}>
           <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">

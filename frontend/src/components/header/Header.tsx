@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'src/root/model';
@@ -13,19 +14,22 @@ export const Header: React.FC = () => {
   return (
     <>
     <div className={styles.headerContainer}>
-      <Link to={"/"}>Home</Link>
-      <Link to={"/about"}>About</Link>
-      {isAuthenticated ? (
-        <>
-          <div>You are logged in.</div>
-          <Link to={"/feedback/" + feedbackKey}>My Feedback Link</Link>
-        </>
-      ): (
-        <button type="button" onClick={()=>setShowLoginModal(true)}>Login</button>
-      )}
+      <div>
+        <Link className={classNames(styles.route, styles.padRight)} to={"/"}>Home</Link>
+        <Link className={classNames(styles.route, styles.padRight)} to={"/about"}>About</Link>
+      </div>
+      <div >
+        <div className={styles.rightNavWrapper}>
+          {isAuthenticated ? (
+            <Link className={styles.route} to={"/feedback/" + feedbackKey}>My Page</Link>
+          ): (
+            <button type="button" className={styles.loginButton} onClick={()=>setShowLoginModal(true)}>Login</button>
+          )}
+        </div>
+      </div>
     </div>
     <Modal show={showLoginModal} close={()=>setShowLoginModal(false)}>
-        <Login/>
+        <Login closeModal={()=>setShowLoginModal(false)}/>
     </Modal>
   </>
   );

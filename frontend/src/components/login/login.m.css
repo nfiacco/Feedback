@@ -3,7 +3,21 @@
 }
 
 .loginContainer {
-    margin:30px;
+    margin: 50px 30px;
+    width: 350px;
+    height: 200px;
+}
+
+.loadingContainer {
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.spinner {
+    color: black !important;
 }
 
 .header {
@@ -20,14 +34,16 @@
 
 .loginButton {
     color: #404040;
-    font-size: 16px;
-    font-weight: 550;
-    padding: 10px 16px;
-    border-width: 2px;
-    border-style: solid;
-    border-radius: 3px;
-    cursor: pointer;
     position: relative;
+    padding: 10px 16px;
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: #303030;
+    font-weight: 550;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: none;
+    background-color: whitesmoke;
     transition: all .1s ease-in-out;
 }
 
