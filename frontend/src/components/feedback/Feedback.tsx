@@ -1,3 +1,4 @@
+import { CircularProgress } from '@material-ui/core';
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -25,15 +26,11 @@ export const Feedback: React.FC = () => {
     return <></>
   }
 
-  if (sendStatus === "SENDING") {
-    return <div>Sending!</div>
-  }
-
   if (sendStatus === "SENT") {
     return (
       <>
         <div>Sent!</div>
-        <a type="button" onClick={sendMore}>Send more?</a>
+        <button type="button" onClick={sendMore}>Send more?</button>
       </>
     )
   }
@@ -43,7 +40,7 @@ export const Feedback: React.FC = () => {
       <>
         <div>An Error Occurred!</div>
         {/* Don't clear the input text if an error happens, we want the user to have a chance to get their input back. */}
-        <a type="button" onClick={clearSendStatus}>Try Again?</a>
+        <button type="button" onClick={clearSendStatus}>Try Again?</button>
       </>
     )
   }
@@ -52,6 +49,7 @@ export const Feedback: React.FC = () => {
     return <NotFound/>
   }
 
+  const sending = sendStatus === "SENDING";
   return (
     <div>
       <Link to={"/"}>Home</Link>
@@ -59,7 +57,9 @@ export const Feedback: React.FC = () => {
         Enter your feedback
       </label>
       <ReactQuill className={styles.textInput} theme="snow" value={inputText} onChange={setInputText}/>
-      <button className={styles.submitButton} onClick={sendFeedback}>Send</button>
+      <button className={styles.submitButton} onClick={sending ? () => undefined : sendFeedback}>
+        {sending ? <CircularProgress className={styles.submitSpinner}/> : "Send"}
+      </button>
     </div>
   );
 }

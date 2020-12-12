@@ -45,6 +45,7 @@ func SendFeedback(env Env, w http.ResponseWriter, r *http.Request) error {
 	textContent := sanitization.StrictPolicy.Sanitize(unescapedContent)
 	sanitizedHtmlContent := sanitization.HtmlPolicy.Sanitize(unescapedContent)
 
+	// TODO: add "don't reply to this email"?
 	mg := mailgun.NewMailgun(mailgunDomain, apiKey)
 	m := mg.NewMessage(
 		"Anonymous Feedback <anonymous@anonymousfeedback.app>",
