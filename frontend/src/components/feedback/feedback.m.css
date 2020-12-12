@@ -1,6 +1,6 @@
 .label {
     display: block;
-    margin: 10px auto 0;
+    margin: 0 auto 20px;
     text-align: center;
 }
 
@@ -9,20 +9,14 @@
     flex-direction: column;
     margin: 10px auto 0 !important;
     width: 80vw;
-    height: 65vh;
+    height: 60vh;
     min-height: fit-content;
     resize: none;
 }
 
-@media (max-width: 600px) {
-    .textInput {
-        height: 60vh;
-    }
-}
-
 .submitButton {
     display: block;
-    margin: 20px auto 0;
+    margin: 30px auto;
     color: #404040;
     padding: 5px 50px;
     border-radius: 5px;
@@ -39,6 +33,17 @@
 .submitButton:hover {
     transform: scale(1.04);
 }
+
+@media (max-width: 600px) {
+    .textInput {
+        height: 55vh;
+    }
+
+    .submitButton {
+        margin: 30px auto 80px;
+    }
+}
+
 
 .submitSpinner {
     width: 15px !important;

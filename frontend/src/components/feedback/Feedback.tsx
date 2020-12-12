@@ -1,11 +1,11 @@
 import { CircularProgress } from '@material-ui/core';
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { useParams } from "react-router-dom";
 import { useCheckKey, useSendFeedback } from "src/components/feedback/actions";
 import { NotFound } from "src/components/NotFound";
 import styles from "./feedback.m.css";
+import "./quill.snow.css";
 
 interface RouteParams {
   key: string;
