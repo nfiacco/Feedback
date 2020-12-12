@@ -7,7 +7,7 @@ import { useStart } from "src/components/app/actions";
 import { Feedback } from 'src/components/feedback/Feedback';
 import { Header } from "src/components/header/Header";
 import { Home } from 'src/components/home/Home';
-import { NotFound } from 'src/components/NotFound';
+import { NotFound } from 'src/components/notfound/NotFound';
 import { useSelector } from "src/root/model";
 
 export const App: React.FC = () => {

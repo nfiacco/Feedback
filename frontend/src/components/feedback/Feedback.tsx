@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import { useParams } from "react-router-dom";
 import { useCheckKey, useSendFeedback } from "src/components/feedback/actions";
-import { NotFound } from "src/components/NotFound";
+import { NotFound } from "src/components/notfound/NotFound";
 import styles from "./feedback.m.css";
 import "./quill.snow.css";
 
