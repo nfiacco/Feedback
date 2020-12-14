@@ -5,7 +5,12 @@ declare const styles: {
   readonly "spinner": string;
   readonly "header": string;
   readonly "loginLabel": string;
-  readonly "buttonWrapper": string;
+  readonly "loginGroup": string;
+  readonly "marginTop": string;
+  readonly "emailInput": string;
+  readonly "invalidEmailBorder": string;
+  readonly "invalidEmailLabel": string;
+  readonly "emailSubmit": string;
   readonly "loginButton": string;
   readonly "buttonContentWrapper": string;
   readonly "iconWrapper": string;

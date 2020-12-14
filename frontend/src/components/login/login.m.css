@@ -5,12 +5,13 @@
 .loginContainer {
     margin: 50px 30px;
     width: 350px;
-    height: 200px;
+    height: 280px;
 }
 
 .loadingContainer {
-    height: 100%;
-    width: 100%;
+    margin: 50px 30px;
+    width: 350px;
+    height: 280px;
     align-items: center;
     display: flex;
     justify-content: center;
@@ -28,12 +29,58 @@
     margin-top: 25px;
 }
 
-.buttonWrapper {
-    margin-top: 50px;
+.loginGroup {
+    width: 320px;
+    margin: 40px auto;
+}
+
+.marginTop {
+    margin-top: 20px;
+}
+
+.emailInput {
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.invalidEmailBorder {
+    border-color: red;
+}
+
+.invalidEmailLabel {
+    color: red;
+    margin-top: 5px;
+    margin-bottom: -5px;
+    font-size: 15px;
+    text-align: left;
+}
+
+.emailSubmit {
+    margin-top: 20px;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 8px 10px;
+    background-color: black;
+    color: white;
+    font-weight: 600;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all .1s ease-in-out;
+}
+
+.emailSubmit:hover {
+    transform: scale(1.03);
 }
 
 .loginButton {
     color: #404040;
+    width: 100%;
+    box-sizing: border-box;
     position: relative;
     padding: 10px 16px;
     border-radius: 5px;

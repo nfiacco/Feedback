@@ -12,8 +12,8 @@ export const Modal: React.FC<ModalProps> = props => {
     const escFunction = (event: KeyboardEvent) => {
       if(event.key === "Escape") {
         props.close();
+        document.removeEventListener("keydown", escFunction);
       }
-      document.removeEventListener("keydown", escFunction);
     };
 
     document.addEventListener("keydown", escFunction);
