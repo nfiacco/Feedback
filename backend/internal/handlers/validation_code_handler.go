@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"feedback/internal/config"
 	"feedback/internal/errors"
+	"feedback/internal/users"
+	"feedback/internal/verifications"
 	"net/http"
 	"regexp"
 
@@ -32,11 +34,21 @@ func ValidationCode(env Env, w http.ResponseWriter, r *http.Request) error {
 		return errors.BadRequest
 	}
 
+	user, err := users.GetOrCreateForEmail(env.Db, request.Email)
+	if err != nil {
+		return err
+	}
+
+	code, err := verifications.Create(env.Db, user.ID)
+	if err != nil {
+		return err
+	}
+
 	mg := mailgun.NewMailgun(mailgunDomain, apiKey)
 	m := mg.NewMessage(
 		"Anonymous Feedback <anonymous@anonymousfeedback.app>",
-		"You have new feedback!",
-		"code here", // TODO: add real code here
+		"Verification Code",
+		*code,
 		request.Email,
 	)
 

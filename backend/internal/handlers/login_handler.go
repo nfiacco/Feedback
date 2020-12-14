@@ -8,6 +8,7 @@ import (
 	"feedback/internal/models"
 	"feedback/internal/sessions"
 	"feedback/internal/users"
+	"feedback/internal/verifications"
 	"net/http"
 
 	"google.golang.org/api/idtoken"
@@ -110,19 +111,19 @@ func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User
 	return user, token, nil
 }
 
-func validateEmailAuthentication(emailAuthentication EmailAuthentication) error {
-	// TODO: validate by looking up code
-	return errors.New("error")
-}
-
 func emailLogin(db *gorm.DB, emailAuthentication EmailAuthentication) (*models.User, *string, error) {
-	err := validateEmailAuthentication(emailAuthentication)
+	// the user is created when the validation code is sent
+	user, err := users.LoadByEmail(db, emailAuthentication.Email)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	user, err := users.GetOrCreateForEmail(db, emailAuthentication.Email)
+	_, err = verifications.VerifyCode(db, emailAuthentication.ValidationCode, user.ID)
 	if err != nil {
+		if errors.IsRecordNotFound(err) {
+			return nil, nil, errors.Unauthorized
+		}
+
 		return nil, nil, err
 	}
 

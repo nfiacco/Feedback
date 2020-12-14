@@ -26,11 +26,6 @@ var mailgunApiKey = secretConfigType{
 	configKey: "mailgun-api-key",
 }
 
-var mailgunValidationKey = secretConfigType{
-	secretKey: "projects/621422061156/secrets/mailgun-validation-key/versions/latest",
-	configKey: "mailgun-validation-key",
-}
-
 func InitConfig() error {
 	if err := addSecretToConfig(databasePassword); err != nil {
 		return err
@@ -40,15 +35,7 @@ func InitConfig() error {
 		return err
 	}
 
-	if err := addSecretToConfig(mailgunValidationKey); err != nil {
-		return err
-	}
-
 	return nil
-}
-
-func GetMailgunValidationKey() string {
-	return viper.GetString(mailgunValidationKey.configKey)
 }
 
 func GetMailgunApiKey() string {
