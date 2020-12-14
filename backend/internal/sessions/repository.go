@@ -15,7 +15,7 @@ const TOKEN_BITS = 256
 const DAY = time.Duration(24) * time.Hour
 const SESSION_EXPIRATION = time.Duration(14) * DAY
 
-func GenerateToken() (*string, error) {
+func generateToken() (*string, error) {
 	b := make([]byte, TOKEN_BITS/8)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -31,9 +31,14 @@ func hashToken(token string) string {
 	return base64.StdEncoding.EncodeToString(h[:])
 }
 
-func Create(db *gorm.DB, rawToken string, userID int64) (*models.Session, error) {
+func Create(db *gorm.DB, userID int64) (*string, error) {
+	rawToken, err := generateToken()
+	if err != nil {
+		return nil, err
+	}
+
 	// we store hashed tokens in case the DB is leaked
-	token := hashToken(rawToken)
+	token := hashToken(*rawToken)
 	expiration := time.Now().Add(SESSION_EXPIRATION)
 
 	session := models.Session{
@@ -47,7 +52,7 @@ func Create(db *gorm.DB, rawToken string, userID int64) (*models.Session, error)
 		return nil, result.Error
 	}
 
-	return &session, nil
+	return rawToken, nil
 }
 
 func Refresh(db *gorm.DB, session *models.Session) (*models.Session, error) {

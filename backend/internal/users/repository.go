@@ -62,6 +62,20 @@ func LoadByExternalID(db *gorm.DB, externalID string) (*models.User, error) {
 	return &user, nil
 }
 
+func LoadByEmail(db *gorm.DB, email string) (*models.User, error) {
+	var user models.User
+	result := db.Table("users").
+		Joins("JOIN emails ON emails.user_id = users.id").
+		Where("emails.email = ?", email).
+		Take(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
+}
+
 func LoadUserAndIdentityByID(db *gorm.DB, userID int64) (*UserAndIdentity, error) {
 	var userAndIdentity UserAndIdentity
 	result := db.Table("users").
@@ -104,7 +118,7 @@ func create(db *gorm.DB) (*models.User, error) {
 	return &user, nil
 }
 
-func CreateUser(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
+func CreateUserForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
 	user, err := create(db)
 	if err != nil {
 		return nil, err
@@ -128,7 +142,7 @@ func CreateUser(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, 
 	return user, nil
 }
 
-func GetOrCreateUser(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
+func GetOrCreateForExternalInfo(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.User, error) {
 	existingUser, err := LoadByExternalID(db, externalUserInfo.ExternalID)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -136,7 +150,37 @@ func GetOrCreateUser(db *gorm.DB, externalUserInfo *ExternalUserInfo) (*models.U
 		return existingUser, nil
 	}
 
-	user, err := CreateUser(db, externalUserInfo)
+	user, err := CreateUserForExternalInfo(db, externalUserInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func CreateUserForEmail(db *gorm.DB, email string) (*models.User, error) {
+	user, err := create(db)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = emails.Create(db, email, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func GetOrCreateForEmail(db *gorm.DB, email string) (*models.User, error) {
+	existingUser, err := LoadByEmail(db, email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	} else if err == nil {
+		return existingUser, nil
+	}
+
+	user, err := CreateUserForEmail(db, email)
 	if err != nil {
 		return nil, err
 	}

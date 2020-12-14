@@ -22,8 +22,17 @@ var NotFound = HttpError{
 	ClientVisibleData: http.StatusText(http.StatusNotFound),
 }
 
+var BadRequest = HttpError{
+	Code:              http.StatusBadRequest,
+	ClientVisibleData: http.StatusText(http.StatusBadRequest),
+}
+
 func Wrap(err error, message string) error {
 	return fmt.Errorf("%s: %w", message, err)
+}
+
+func New(message string) error {
+	return errors.New(message)
 }
 
 func IsRecordNotFound(err error) bool {

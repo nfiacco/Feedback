@@ -4,56 +4,40 @@ import (
 	"context"
 	"encoding/json"
 	"feedback/internal/auth"
+	"feedback/internal/errors"
+	"feedback/internal/models"
 	"feedback/internal/sessions"
 	"feedback/internal/users"
-	"log"
 	"net/http"
 
 	"google.golang.org/api/idtoken"
+	"gorm.io/gorm"
 )
 
 const CLIENT_ID = "621422061156-f3f0o58fonsm9ohnqq5ngpa981c6k3hc.apps.googleusercontent.com"
 
+type EmailAuthentication struct {
+	Email          string `json:"email"`
+	ValidationCode string `json:"validation_code"`
+}
+
 type LoginRequest struct {
-	IdToken string `json:"id_token"`
+	IdToken             *string              `json:"id_token,omitempty"`
+	EmailAuthentication *EmailAuthentication `json:"email_authentication,omitempty"`
 }
 
 type LoginResponse struct {
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
 	FeedbackKey string `json:"feedback_key"`
-}
-
-func validateAndParseIdToken(ctx context.Context, loginRequest LoginRequest) (*users.ExternalUserInfo, error) {
-	validator, err := idtoken.NewValidator(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	payload, err := validator.Validate(ctx, loginRequest.IdToken, CLIENT_ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &users.ExternalUserInfo{
-		ExternalID: payload.Subject,
-		Email:      payload.Claims["email"].(string),
-		FirstName:  payload.Claims["family_name"].(string),
-		LastName:   payload.Claims["given_name"].(string),
-	}, nil
 }
 
 func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	if env.Auth.IsAuthenticated {
-		log.Printf("already authed")
 		userAndIdentity, err := users.LoadUserAndIdentityByID(env.Db, env.Auth.Session.UserID)
 		if err != nil {
 			return err
 		}
 
 		return json.NewEncoder(w).Encode(LoginResponse{
-			FirstName:   userAndIdentity.FirstName,
-			LastName:    userAndIdentity.LastName,
 			FeedbackKey: userAndIdentity.FeedbackKey,
 		})
 	}
@@ -66,30 +50,86 @@ func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	}
 
 	ctx := r.Context()
-	externalUserInfo, err := validateAndParseIdToken(ctx, loginRequest)
-	if err != nil {
-		return err
+
+	var user *models.User
+	var token *string
+	switch {
+	case loginRequest.IdToken != nil:
+		user, token, err = googleLogin(ctx, env.Db, *loginRequest.IdToken)
+	case loginRequest.EmailAuthentication != nil:
+		user, token, err = emailLogin(env.Db, *loginRequest.EmailAuthentication)
+	default:
+		return errors.BadRequest
 	}
 
-	user, err := users.GetOrCreateUser(env.Db, externalUserInfo)
-	if err != nil {
-		return err
-	}
-
-	token, err := sessions.GenerateToken()
-	if err != nil {
-		return err
-	}
-
-	_, err = sessions.Create(env.Db, *token, user.ID)
 	if err != nil {
 		return err
 	}
 
 	auth.AddSessionCookie(w, *token)
 	return json.NewEncoder(w).Encode(LoginResponse{
-		FirstName:   externalUserInfo.FirstName,
-		LastName:    externalUserInfo.LastName,
 		FeedbackKey: user.FeedbackKey,
 	})
+}
+
+func validateAndParseIdToken(ctx context.Context, idToken string) (*users.ExternalUserInfo, error) {
+	validator, err := idtoken.NewValidator(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	payload, err := validator.Validate(ctx, idToken, CLIENT_ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &users.ExternalUserInfo{
+		ExternalID: payload.Subject,
+		Email:      payload.Claims["email"].(string),
+		FirstName:  payload.Claims["family_name"].(string),
+		LastName:   payload.Claims["given_name"].(string),
+	}, nil
+}
+
+func googleLogin(ctx context.Context, db *gorm.DB, idToken string) (*models.User, *string, error) {
+	externalUserInfo, err := validateAndParseIdToken(ctx, idToken)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	user, err := users.GetOrCreateForExternalInfo(db, externalUserInfo)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	token, err := sessions.Create(db, user.ID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return user, token, nil
+}
+
+func validateEmailAuthentication(emailAuthentication EmailAuthentication) error {
+	// TODO: validate by looking up code
+	return errors.New("error")
+}
+
+func emailLogin(db *gorm.DB, emailAuthentication EmailAuthentication) (*models.User, *string, error) {
+	err := validateEmailAuthentication(emailAuthentication)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	user, err := users.GetOrCreateForEmail(db, emailAuthentication.Email)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	token, err := sessions.Create(db, user.ID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return user, token, nil
 }
