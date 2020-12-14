@@ -27,7 +27,7 @@ var mailgunApiKey = secretConfigType{
 }
 
 var mailgunValidationKey = secretConfigType{
-	secretKey: "projects/621422061156/secrets/mailgun-validation-key",
+	secretKey: "projects/621422061156/secrets/mailgun-validation-key/versions/latest",
 	configKey: "mailgun-validation-key",
 }
 

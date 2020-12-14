@@ -41,4 +41,10 @@ var Routes = []Route{
 		Pattern:     "/send",
 		HandlerFunc: handlers.SendFeedback,
 	},
+	Route{
+		Name:        "Send validation code",
+		Method:      "POST",
+		Pattern:     "/validation_code",
+		HandlerFunc: handlers.ValidationCode,
+	},
 }
