@@ -1,12 +1,14 @@
 import { CircularProgress } from "@material-ui/core";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
+import { useSelector } from "src/root/model";
 import isEmail from 'validator/lib/isEmail';
-import { useHandleGoogleResponse } from "./actions";
+import { useEmailLogin, useHandleGoogleResponse, useRequestValidationCode } from "./actions";
 import styles from "./login.m.css";
 
 const GOOGLE_CLIENT_ID = "621422061156-f3f0o58fonsm9ohnqq5ngpa981c6k3hc.apps.googleusercontent.com";
+const CODE_LENGTH = 6;
 
 interface LoginProps {
   closeModal: () => void;
@@ -14,9 +16,14 @@ interface LoginProps {
 
 export const Login: React.FC<LoginProps> = props => {
   const [ loading, setLoading ] = useState(false);
+  const validatingCode = useSelector(state => state.login.validatingCode);
+  const authenticated = useSelector(state => state.login.authenticated);
   const handleGoogleResponse = useHandleGoogleResponse();
   const onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
     handleGoogleResponse(response);
+  }
+
+  if (authenticated) {
     props.closeModal();
   }
 
@@ -28,20 +35,26 @@ export const Login: React.FC<LoginProps> = props => {
     )
   }
 
+  const loginOptions = (
+    <>
+      <GoogleLogin
+      clientId={GOOGLE_CLIENT_ID}
+      onSuccess={onSuccess}
+      render={renderProps => <GoogleButton onClick={renderProps.onClick} setLoading={setLoading}/>}
+      onFailure={()=>setLoading(false)}
+      />
+      <div className={styles.marginTop}>
+        or
+      </div>
+      <EmailLogin setLoading={setLoading}/>
+    </>
+  );
+
   return (
     <div className={styles.loginContainer}>
       <h2 className={classNames(styles.center, styles.header)}>Anonymous Feedback</h2>
       <div className={classNames(styles.center, styles.loginGroup)}>
-        <GoogleLogin
-          clientId={GOOGLE_CLIENT_ID}
-          onSuccess={onSuccess}
-          render={renderProps => <GoogleButton onClick={renderProps.onClick} setLoading={setLoading}/>}
-          onFailure={()=>setLoading(false)}
-        />
-        <div className={styles.marginTop}>
-          or
-        </div>
-        <EmailLogin/>
+        {validatingCode ? (<ValidationCodeInput/>) : loginOptions}
       </div>
     </div>
   );
@@ -74,12 +87,17 @@ const GoogleButton: React.FC<GoogleButtonProps> = props => {
         Sign in with Google
       </div>
     </button>
-  )
+  );
+};
+
+interface EmailLoginProps {
+  setLoading: (loading: boolean) => void;
 }
 
-const EmailLogin: React.FC = () => {
+const EmailLogin: React.FC<EmailLoginProps> = props => {
   const [ email, setEmail ] = useState("");
   const [ isValid, setIsValid ] = useState(true);
+  const requestValidationCode = useRequestValidationCode();
 
   const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     event.stopPropagation();
@@ -88,22 +106,30 @@ const EmailLogin: React.FC = () => {
     }
   }
 
-  const validateEmail = () => {
-    setIsValid(isEmail(email));
+  const validateEmail = (): boolean => {
+    const valid = isEmail(email);
+    setIsValid(valid);
+    return valid;
   }
 
-  const onSubmit = () => {
-    validateEmail();
-    console.log(email);
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    props.setLoading(true);
+    if (!validateEmail()) {
+      return;
+    }
+
+    await requestValidationCode(email);
+    props.setLoading(false);
   }
 
-  let classes = [styles.emailInput]
+  let classes = [styles.input];
   if (!isValid) {
-    classes.push(styles.invalidEmailBorder);
+    classes.push(styles.invalidBorder);
   }
 
   return (
-    <div className={styles.marginTop}>
+    <form className={styles.marginTop} onSubmit={onSubmit}>
       <input
         type="text"
         id="email"
@@ -115,8 +141,73 @@ const EmailLogin: React.FC = () => {
         onChange={e => setEmail(e.target.value)}
         onBlur={validateEmail}
       />
-      {!isValid && <div className={styles.invalidEmailLabel}>Please check your email.</div>}
-      <input type="submit" value="Continue" className={styles.emailSubmit} onClick={onSubmit}/>
-    </div>
-  )
+      {!isValid && <div className={styles.invalidLabel}>Please check your email.</div>}
+      <input type="submit" value="Continue" className={styles.submit}/>
+    </form>
+  );
+};
+
+
+const ValidationCodeInput: React.FC = () => {
+  const email = useSelector(state => state.login.email);
+  const [ code, setCode ] = useState("");
+  const [ isValid, setIsValid ] = useState(true);
+  const emailLogin = useEmailLogin();
+
+  const onKeydown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    event.stopPropagation();
+    if(event.key === "Escape") {
+      event.currentTarget.blur();
+    }
+  }
+
+  const validateCode = (): boolean => {
+    const valid = code.length === CODE_LENGTH;
+    setIsValid(valid);
+    return valid;
+  }
+
+  const updateCode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const cleaned = raw.replace(/\D/g,'');
+    setCode(cleaned);
+  }
+
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!validateCode()) {
+      return;
+    }
+
+    if (!email) {
+      console.log("Something went wrong.");
+      return;
+    }
+
+    emailLogin(email, code);
+  }
+
+  let classes = [styles.input];
+  if (!isValid) {
+    classes.push(styles.invalidBorder);
+  }
+
+  return (
+    <form className={styles.extraMarginTop} onSubmit={onSubmit}>
+      <input
+        type="text"
+        id="code"
+        name="code"
+        autoComplete="one-time-code"
+        placeholder="Code"
+        className={classNames(classes)}
+        onKeyDown={onKeydown}
+        onChange={updateCode}
+        onBlur={validateCode}
+        value={code}
+      />
+      {!isValid && <div className={styles.invalidLabel}>Invalid code.</div>}
+      <input type="submit" value="Continue" className={styles.submit}/>
+    </form>
+  );
 };

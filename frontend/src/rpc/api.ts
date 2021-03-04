@@ -24,18 +24,31 @@ export const SendFeedback: IEndpoint<SendRequest, undefined> = {
     path: "/send",
 };
 
+export const ValidationCode: IEndpoint<ValidationCodeRequest, undefined> = {
+    method: "POST",
+    path: "/validation_code",
+};
+
+export interface ValidationCodeRequest {
+    email: string;
+}
+
 export interface SendRequest {
     feedback_key: string;
     escaped_content: string;
 }
 
+export interface EmailAuthentication {
+    email: string;
+    validation_code: string;
+}
+
 export interface LoginRequest {
-    id_token: string;
+    id_token?: string;
+    email_authentication?: EmailAuthentication;
 }
 
 export interface LoginResponse {
-    first_name: string;
-    last_name: string;
     feedback_key: string;
 }
 

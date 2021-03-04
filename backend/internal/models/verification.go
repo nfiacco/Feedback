@@ -8,7 +8,7 @@ type Verification struct {
 	Code       string
 	UserID     int64
 	Expiration time.Time
-	User       bool
+	Used       bool
 
 	BaseModel
 }

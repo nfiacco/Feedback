@@ -7,10 +7,11 @@ declare const styles: {
   readonly "loginLabel": string;
   readonly "loginGroup": string;
   readonly "marginTop": string;
-  readonly "emailInput": string;
-  readonly "invalidEmailBorder": string;
-  readonly "invalidEmailLabel": string;
-  readonly "emailSubmit": string;
+  readonly "extraMarginTop": string;
+  readonly "input": string;
+  readonly "invalidBorder": string;
+  readonly "invalidLabel": string;
+  readonly "submit": string;
   readonly "loginButton": string;
   readonly "buttonContentWrapper": string;
   readonly "iconWrapper": string;
