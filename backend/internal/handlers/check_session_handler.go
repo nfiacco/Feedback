@@ -7,8 +7,6 @@ import (
 )
 
 type CheckSessionResponse struct {
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
 	FeedbackKey string `json:"feedback_key"`
 }
 
@@ -18,14 +16,12 @@ func CheckSession(env Env, w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	userAndIdentity, err := users.LoadUserAndIdentityByID(env.Db, env.Auth.Session.UserID)
+	user, err := users.LoadUserByID(env.Db, env.Auth.Session.UserID)
 	if err != nil {
 		return err
 	}
 
 	return json.NewEncoder(w).Encode(CheckSessionResponse{
-		FirstName:   userAndIdentity.FirstName,
-		LastName:    userAndIdentity.LastName,
-		FeedbackKey: userAndIdentity.FeedbackKey,
+		FeedbackKey: user.FeedbackKey,
 	})
 }

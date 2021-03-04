@@ -33,13 +33,13 @@ type LoginResponse struct {
 
 func Login(env Env, w http.ResponseWriter, r *http.Request) error {
 	if env.Auth.IsAuthenticated {
-		userAndIdentity, err := users.LoadUserAndIdentityByID(env.Db, env.Auth.Session.UserID)
+		user, err := users.LoadUserByID(env.Db, env.Auth.Session.UserID)
 		if err != nil {
 			return err
 		}
 
 		return json.NewEncoder(w).Encode(LoginResponse{
-			FeedbackKey: userAndIdentity.FeedbackKey,
+			FeedbackKey: user.FeedbackKey,
 		})
 	}
 

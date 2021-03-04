@@ -53,7 +53,5 @@ export interface LoginResponse {
 }
 
 export interface CheckSessionResponse {
-    first_name: string;
-    last_name: string;
     feedback_key: string;
 }
